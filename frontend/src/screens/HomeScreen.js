@@ -1,16 +1,35 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Product from "../component/Product";
-import data from "../data"
+import MessageBox from '../component/MessageBox';
+import LoadingBox from '../component/LoadingBox';
+import {useDispatch,useSelector} from "react-redux"
+import { listProducts } from '../actions/productActions';
 
 export default function HomeScreen() {
-    return (
-        
-    <div className="row center">
+  const dispatch = useDispatch();
+  const productList = useSelector(state => state.productList);
+  const {loading, error, products} = productList;
+  
+
+  useEffect(() => {
+    dispatch(listProducts())
+  }, [dispatch])
+  return (
+    <div>
+      {loading? (<LoadingBox></LoadingBox>)
+      :
+      error?(<MessageBox variant="danger">{error}</MessageBox>)
+      :
+      (
+      <div className="row center">
       {
-        data.products.map(product => (
+        products.map(product => (
           <Product key={product._id} product={product} />
         ))
       }
+    </div>)
+      }
+    
     </div>
   
     )

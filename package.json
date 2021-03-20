@@ -1,0 +1,28 @@
+{
+  "name": "amazon-clone",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon --watch backend --exec node --experimental-modules backend/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wangjh789/Amazon_Clone.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wangjh789/Amazon_Clone/issues"
+  },
+  "homepage": "https://github.com/wangjh789/Amazon_Clone#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "eslint": "^7.22.0",
+    "eslint-plugin-react": "^7.22.0",
+    "nodemon": "^2.0.7"
+  }
+}
