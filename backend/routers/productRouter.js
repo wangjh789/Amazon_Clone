@@ -1,21 +1,21 @@
-import express from "express"
+import express from "express";
 import expressAsyncHandler from "express-async-handler";
 import data from "../data.js";
 import Product from "../models/productModel.js";
 
 const productRouter = express.Router();
 
-productRouter.get("/",
-    expressAsyncHandler(async (req,res)=>{
+productRouter.get(
+  "/",
+  expressAsyncHandler(async (req, res) => {
     const products = await Product.find({});
-    if(products){
-        res.send(products)
+    if (products) {
+      res.send(products);
+    } else {
+      res.status(404).send({ message: "Products Not Found" });
     }
-    else{
-        res.status(404).send({message:"Products Not Found"})
-    }
-
-}))
+  })
+);
 
 // productRouter.get("/seed",expressAsyncHandler(async(req,res)=>{
 //     await Product.remove({});
@@ -23,16 +23,16 @@ productRouter.get("/",
 //     res.send({createdProducts})
 // }))
 
-productRouter.get("/:id",
-    expressAsyncHandler(async(req,res)=>{
-        const product = await Product.findById(req.params.id)
-        if(product){
-            console.log("-------------")
-            console.log(product)
-            res.send(product)
-        }else{
-            res.status(404).send({message:"Product Not Found"})
-        }
-}))
+productRouter.get(
+  "/:id",
+  expressAsyncHandler(async (req, res) => {
+    const product = await Product.findById(req.params.id);
+    if (product) {
+      res.send(product);
+    } else {
+      res.status(404).send({ message: "Product Not Found" });
+    }
+  })
+);
 
 export default productRouter;
