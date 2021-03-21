@@ -1,42 +1,26 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { createOrder } from "../actions/orderActions";
-import CheckoutSteps from "../component/CheckoutSteps";
+import { detailsOrder } from "../actions/orderActions";
 import LoadingBox from "../component/LoadingBox";
 import MessageBox from "../component/MessageBox";
-import { ORDER_CREATE_RESET } from "../constants/orderConstants";
 
-export default function PlaceOrderScreen(props) {
-  const cart = useSelector((state) => state.cart);
-  if (!cart.paymentMethod) {
-    props.history.push("/payment");
-  }
-  const orderCreate = useSelector((state) => state.orderCreate);
-  const { loading, success, error, order } = orderCreate;
-  const toPrice = (num) => Number(num.toFixed(2)); // 5.123 => "5.12" => 5.12
-  cart.itemsPrice = toPrice(
-    cart.cartItems.reduce((a, c) => a + c.qty * c.price, 0)
-  );
-  cart.shippingPrice = cart.itemsPrice > 100 ? toPrice(0) : toPrice(10);
-  cart.taxPrice = toPrice(0.15 * cart.itemsPrice);
-  cart.totalPrice = cart.itemsPrice + cart.shippingPrice + cart.taxPrice;
+export default function OrderScreen(props) {
+  const orderId = props.match.params.id;
+  const orderDetails = useSelector((state) => state.orderDetails);
+  const { order, loading, error } = orderDetails;
   const dispatch = useDispatch();
-  const placeOrderHandler = () => {
-    //api 에서는 cartItems 가 아닌 orderItems를 원한다. 이름 변경
-    dispatch(createOrder({ ...cart, orderItems: cart.cartItems }));
-  };
-
   useEffect(() => {
-    if (success) {
-      props.history.push(`/order/${order._id}`);
-      dispatch({ type: ORDER_CREATE_RESET });
-    }
-  }, [dispatch, success, order, props.history]);
+    dispatch(detailsOrder(orderId));
+  }, [dispatch, orderId]);
 
-  return (
+  return loading ? (
+    <LoadingBox></LoadingBox>
+  ) : error ? (
+    <MessageBox variant="danger">{error}</MessageBox>
+  ) : (
     <div>
-      <CheckoutSteps step1 step2 step3 step4></CheckoutSteps>
+      <h1>Order {order._id}</h1>
       <div className="row top">
         <div className="col-2">
           <ul>
@@ -45,12 +29,20 @@ export default function PlaceOrderScreen(props) {
                 <h2>Shipping</h2>
                 <p>
                   <strong>Name:</strong>
-                  {cart.shippingAddress.fullName} <br />
+                  {order.shippingAddress.fullName} <br />
                   <strong>Address:</strong>
-                  {cart.shippingAddress.address}
-                  {cart.shippingAddress.city},{cart.shippingAddress.postalCode},
-                  {cart.shippingAddress.country}
+                  {order.shippingAddress.address}
+                  {order.shippingAddress.city},
+                  {order.shippingAddress.postalCode},
+                  {order.shippingAddress.country}
                 </p>
+                {order.isDelivered ? (
+                  <MessageBox variant="success">
+                    Delivered At {order.deliveredAt}
+                  </MessageBox>
+                ) : (
+                  <MessageBox variant="danger">Not Delivered</MessageBox>
+                )}
               </div>
             </li>
             <li>
@@ -58,15 +50,22 @@ export default function PlaceOrderScreen(props) {
                 <h2>Payment</h2>
                 <p>
                   <strong>Method:</strong>
-                  {cart.paymentMethod} <br />
+                  {order.paymentMethod} <br />
                 </p>
+                {order.isPaid ? (
+                  <MessageBox variant="success">
+                    Paid At {order.paidAy}
+                  </MessageBox>
+                ) : (
+                  <MessageBox variant="danger">Not Paid</MessageBox>
+                )}
               </div>
             </li>
             <li>
               <div className="card card-body">
                 <h2>Order Items</h2>
                 <ul>
-                  {cart.cartItems.map((item) => (
+                  {order.orderItems.map((item) => (
                     <li key={item.product}>
                       <div className="row">
                         <div>
@@ -102,41 +101,29 @@ export default function PlaceOrderScreen(props) {
               <li>
                 <div className="row">
                   <div>Items</div>
-                  <div>${cart.itemsPrice}</div>
+                  <div>${order.itemsPrice}</div>
                 </div>
               </li>
               <li>
                 <div className="row">
                   <div>Shipping</div>
-                  <div>${cart.shippingPrice}</div>
+                  <div>${order.shippingPrice}</div>
                 </div>
               </li>
               <li>
                 <div className="row">
                   <div>Tax</div>
-                  <div>${cart.taxPrice}</div>
+                  <div>${order.taxPrice}</div>
                 </div>
               </li>
               <li>
                 <div className="row">
                   <div>Order Total</div>
                   <div>
-                    <strong>${cart.totalPrice}</strong>
+                    <strong>${order.totalPrice}</strong>
                   </div>
                 </div>
               </li>
-              <li>
-                <button
-                  type="button"
-                  onClick={placeOrderHandler}
-                  className="primary block"
-                  disabled={cart.cartItems.length === 0}
-                >
-                  Place Order
-                </button>
-              </li>
-              {loading && <LoadingBox></LoadingBox>}
-              {error && <MessageBox variant="danger">{error}</MessageBox>}
             </ul>
           </div>
         </div>
