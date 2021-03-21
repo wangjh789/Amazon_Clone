@@ -1,4 +1,3 @@
-import { process } from "ipaddr.js"
 import jwt from "jsonwebtoken"
 
 export const generateToken = (user) =>{
@@ -8,8 +7,8 @@ export const generateToken = (user) =>{
         email : user.email,
         isAdmin : user.isAdmin,
     }, 
-    process.env.JWT_SECRET,
-    {expriresIn : "30d",
+    process.env.JWT_SECRET || "woowang",
+    {expiresIn : "30d",
 
     }
     )

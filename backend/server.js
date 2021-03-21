@@ -7,6 +7,8 @@ import productRouter from "./routers/productRouter.js";
 dotenv.config()
 
 const app = express();
+app.use(express.json()) //바디를 json으로 바꿔주는 미들웨어
+app.use(express.urlencoded({extended:true}))
 mongoose.connect(process.env.MONGODB_URL,{
     useNewUrlParser:true,
     useUnifiedTopology:true,
