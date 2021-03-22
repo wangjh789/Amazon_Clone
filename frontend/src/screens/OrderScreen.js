@@ -3,7 +3,7 @@ import { PayPalButton } from "react-paypal-button-v2";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { detailsOrder } from "../actions/orderActions";
+import { detailsOrder, payOrder } from "../actions/orderActions";
 import LoadingBox from "../component/LoadingBox";
 import MessageBox from "../component/MessageBox";
 
@@ -12,6 +12,9 @@ export default function OrderScreen(props) {
   const [sdkReady, setSdkReady] = useState(false);
   const orderDetails = useSelector((state) => state.orderDetails);
   const { order, loading, error } = orderDetails;
+
+  const orderPay = useSelector((state) => state.orderPay);
+  const { error: errorPay, success: successPay } = orderPay; //rename
   const dispatch = useDispatch();
   useEffect(() => {
     const addPayPalScript = async () => {
@@ -41,8 +44,8 @@ export default function OrderScreen(props) {
     }
   }, [dispatch, sdkReady, order, orderId]);
 
-  const successPaymentHandler = () => {
-    //TODO dispatch pay order
+  const successPaymentHandler = (paymentResult) => {
+    dispatch(payOrder(order, paymentResult));
   };
 
   return loading ? (
